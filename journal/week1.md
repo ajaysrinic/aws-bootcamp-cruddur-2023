@@ -106,8 +106,9 @@ COPY html /usr/share/nginx/html
 </html>
 ```
 **Output:**
+![Output for Health check](assets/docker_health.jpg)
 
-![Output for Health check](assets/healthcheck.jpg)
+![Hosted Hello World](assets/healthcheck.jpg)
 
 ### Installation of Docker in local machine
 I followed the Docker documentation to install the Docker application in my local system.
