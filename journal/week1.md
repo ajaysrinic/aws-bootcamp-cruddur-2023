@@ -106,7 +106,7 @@ COPY html /usr/share/nginx/html
 </html>
 ```
 **Output:**
-![Output for Health check](assets/docker_health.jpg)
+![Output for Health check](assets/docker_healthcheck.jpg)
 
 ![Hosted Hello World](assets/healthcheck.jpg)
 
