@@ -2,8 +2,10 @@ from flask import Flask
 from flask import request
 from flask_cors import CORS, cross_origin
 import os
+import sys
 
 from services.home_activities import *
+from services.notifications_activities import *
 from services.user_activities import *
 from services.create_activity import *
 from services.create_reply import *
@@ -98,7 +100,7 @@ def init_rollbar():
     """init rollbar module"""
     rollbar.init(
         # access token
-        'e9e58dc0ea8b4741a9d41693b1bbcad8',
+        '946af89f475e4fd6ad395cc6090b1c2f',
         # environment name
         'production',
         # server root directory, makes tracebacks prettier
