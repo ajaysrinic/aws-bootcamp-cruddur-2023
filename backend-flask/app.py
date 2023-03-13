@@ -31,9 +31,9 @@ from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
 # CloudWatch Logs ----
 import watchtower
 import logging
+from time import strftime
 
 # Rollbar ------
-from time import strftime
 import os
 import rollbar
 import rollbar.contrib.flask
@@ -100,7 +100,7 @@ def init_rollbar():
     """init rollbar module"""
     rollbar.init(
         # access token
-        '${ROLLBAR_ACCESS_TOKEN}',
+        '946af89f475e4fd6ad395cc6090b1c2f',
         # environment name
         'production',
         # server root directory, makes tracebacks prettier
