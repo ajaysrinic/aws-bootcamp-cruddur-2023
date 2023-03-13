@@ -25,15 +25,13 @@ I followed the honeycomb documentation for Python and also Jessica's advice on h
 ![](assets/honeycomb_trace.jpg)
 
 ## #2 AWS X-RAY
-Amazon provides us another service called X-RAY which is helpful to trace requests of microservices. Analyzes and Debugs application running on distributed environment. I created segements and subsegments by following the instructional videos. 
+I integrated AWS X-RAY in our application by following the below steps:
 
-- To get your application traced in AWS X-RAY you need to install aws-xray-sdk module. You can do this by running the below command.
+**Installation of aws-xray package**
 ```
 pip install aws-xray-sdk
 ```
-But in our bootcamp project we had added this module in our `requirements.txt` file and installed. 
-
-- Created our own Sampling Rule name 'Cruddur'. This code was written in `aws/json/xray.json` file
+To create our own Sampling Rule named 'Cruddur', the code was present in `aws/json/xray.json` file.
 ```
 {
   "SamplingRule": {
@@ -51,21 +49,19 @@ But in our bootcamp project we had added this module in our `requirements.txt` f
   }
 }
 ```
-- **To create a new group for tracing and analyzing errors and faults in a Flask application.**
+- **To create a new group for tracing and analyzing errors and faults in the Flask application.**
 ```
 FLASK_ADDRESS="https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
 aws xray create-group \
    --group-name "Cruddur" \
    --filter-expression "service(\"$FLASK_ADDRESS\")"
 ```
-The above code is useful for setting up monitoring for a specific Flask service using AWS X-Ray. It creates a group that can be used to visualize and analyze traces for that service, helping developers identify and resolve issues more quickly.
+The code provided enables monitoring of a Flask service using AWS X-Ray by creating a trace analysis group. This helps developers quickly identify and address issues related to the service.
 
-Then run this command to get the above code executed 
 ```
 aws xray create-sampling-rule --cli-input-json file://aws/json/xray.json
 ```
-- **Install Daemon Service**
-Then I had to add X-RAY Daemon Service for that I added this part of code in my `docker-compose.yml` file.
+**Installation of AWS X-RAY Daemon Service**
 ```
  xray-daemon:
     image: "amazon/aws-xray-daemon"
@@ -78,32 +74,18 @@ Then I had to add X-RAY Daemon Service for that I added this part of code in my 
     ports:
       - 2000:2000/udp
 ```
-Also added Environment Variables :
+Added Environment Variables in `docker-compose` file :
 ```
    AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
    AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
 ```
 
-## My X-RAY Error 
-When I was creatigna sampling rule then at te end after setting all the things when I had to run the last coomand `aws xray create-sampling-rule --cli-input-json file://aws/json/xray.json` to create a sampling rule I faced `Error parsing parameter` and `Error2: No such file or directory found`. 
+## X-RAY Error 
+Basically, I set up everything as per Andrew's videos but for me the AWS X-RAY daemon wasn't sending out any segments.
 
-![]()
+![](assets/aws_xray.png)
 
-## Solved X-RAY Error
-
-So, I was in the wrong directory (frontend-react-js) while performing this task. I **changed my directory to `backend-flask`** and it was working all good. 
-
-## AWS X-RAY Subsegments
-There was a problem faced while creating subsegments in AWS X-RAY. But then one of our bootcamper (Olga Timofeeva) tried to figure it out and that somewhat helped. So we added `capture` method to get subsgements and closed the segment in the end by using `end-subsegment`. Below is the code that we added additionally to bring subsegments.
-```
-@app.route("/api/activities/<string:activity_uuid>", methods=['GET'])
-@xray_recorder.capture('activities_show')
-def data_show_activity(activity_uuid):
-  data = ShowActivity.run(activity_uuid=activity_uuid)
-  return data, 200
-```
-After adding I got subsegments 
-![]()
+Since X-RAY was used as an alternative I'm going to start using Honeycomb for tracing in future, as per Andrew's advice during the Q&A session.
 
 ## #3 CloudWatch
 To use CloudWatch I installed `watchtower` package using pip. The environment variables were set in `docker-compose.yml` file as usual.
@@ -173,18 +155,28 @@ def rollbar_test():
     return "Hello World!"
 ```
 
-## Rollbar Error
-I am facing an issue while sending data to my Rollbar account. If you look at the below image, there is no GET request sent to Rollbar(connectivity issue).
+## Fixed Rollbar Error
+I was facing an issue while sending data to my Rollbar account. If you look at the below image, there is no GET request sent to Rollbar(connectivity issue).
+
 ![](assets/rollbar_connection.png)
 
-
-I tried to solve it but no luck. There's a deafult project in our rollbar account called `FirstPorject`, so I created another project called `AWSBootcamp`. This gave me an option to choose `items` tab but it wasn't receiving any data.
+At first, I seeked help and tried to solve it but no luck. But later, I noticed that my container was fetching my old access token for some reason. Even though I set the environment variables in Gitpod, it didn't update. 
 
 ![](assets/rollbar_error.png)
 
-**Rollback keeps waiting for my data**
+**Rollback kept waiting for my data**
+
 ![](assets/rollbar_project.png)
 
+Finally, I hardcoded the API key and now I'm able to receive data in Rollbar.
+
+![](assets/rollbar_get.png)
+![](assets/rollbar.png)
+
 ## #5 Watched Pricing and Security Consideration Videos
-- **Security** : Got to know about the Observability and Monitoring tools and how they are useful for our project, security maintainence and debugging purpose. Also attended the quiz. Here's the link for Ashish's video : https://www.youtube.com/watch?v=bOf4ITxAcXc&list=PLBfufR7vyJJ7k25byhRXJldB5AiwgNnWv&index=31 
-- **Pricing** : In Chirag's pricing video, I examined the pricing models of Honeycomb, X-Ray, CloudWatch, and Rollbar. Through this exploration, I learned about the free-tier services offered by Amazon and the monthly capacity they provide. It's worth noting that pricing for these services as it varies by region.
+
+**Pricing** : In Chirag's pricing video, I examined the pricing models of Honeycomb, X-Ray, CloudWatch, and Rollbar. Through this exploration, I learned about the free-tier services offered by Amazon and the monthly capacity they provide. It's worth noting the pricing for these services as it varies by region.
+
+**Security** : I learned about the benefits of Observability and Monitoring tools in regards to our project, including their usefulness for maintaining security and debugging issues.
+
+Attended both the quizzes in Pricing & Security.
